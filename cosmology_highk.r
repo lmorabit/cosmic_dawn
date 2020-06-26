@@ -1,7 +1,8 @@
 ## source the files I want
-source('physical_constants.r')
+source('~/software/cosmic_dawn/physical_constants.r')
 library('pracma')
-source('lofar_cosmo_sensitivity.r')
+library('plotrix')
+source('~/software/cosmic_dawn/lofar_cosmo_sensitivity.r')
 
 
 library('viridis')
@@ -27,6 +28,22 @@ lplot <- function( x, y, x_lab='', y_lab='', margins=c(5,5,2,2), leg=TRUE, xaxon
 
 }
 
+tcol <- function(color, trans = 100) {
+
+  if (length(color) != length(trans) &
+        !any(c(length(color), length(trans)) == 1))
+    stop('Vector lengths not correct')
+  if (length(color) == 1 & length(trans) > 1)
+    color <- rep(color, length(trans))
+  if (length(trans) == 1 & length(color) > 1)
+    trans <- rep(trans, length(color))
+
+  res <- paste0('#', apply(apply(rbind(col2rgb(color)), 2, function(x)
+    format(as.hexmode(x), 2)), 2, paste, collapse = ''))
+  res <- unlist(unname(Map(paste0, res, as.character(as.hexmode(trans)))))
+  res[is.na(color)] <- NA
+  return(res)
+}
 
 ## define cosmology
 
@@ -276,7 +293,7 @@ zz_kpar_max <- c()
 
 cairo_pdf('wedge_limits.pdf')
 
-lplot( 1, 1, xlim=c(1e-1,1e3), ylim=c(1e-1,1e3), type='n', log='xy', x_lab='k_perp', y_lab='Redshift', xaxs = "i", yaxs = "i", xaxon=FALSE, yaxon=FALSE ) 
+lplot( 1, 1, xlim=c(3e0,1e3), ylim=c(2e-1,4e2), type='n', log='xy', x_lab='k_perp', y_lab='Redshift', xaxs = "i", yaxs = "i", xaxon=FALSE, yaxon=FALSE ) 
 for ( zval in z_values ){
     
     ## get k-perp-min and max
@@ -343,17 +360,17 @@ for ( zval in z_values ){
     
 }
 
-text( 1e0, 0.125e2, 'z=30', col=tcol(zcols[1],150), font=2, cex=2)
-text( 1e0, 0.25e2, 'z=35', col=tcol(zcols[2],150), font=2, cex=2)
-text( 1e0, 0.5e2, 'z=40', col=tcol(zcols[3],150), font=2, cex=2)
-text( 1e0, 1e2, 'z=45', col=tcol(zcols[4],150), font=2, cex=2)
+text( 6e0, 0.125e2, 'z=30', col=tcol(zcols[1],150), font=2, cex=2)
+text( 6e0, 0.25e2, 'z=35', col=tcol(zcols[2],150), font=2, cex=2)
+text( 6e0, 0.5e2, 'z=40', col=tcol(zcols[3],150), font=2, cex=2)
+text( 6e0, 1e2, 'z=45', col=tcol(zcols[4],150), font=2, cex=2)
 
-text( 1.75e2, 0.3e0, 'Foreground', font=2, cex=1.5 )
-text( 1.75e2, 0.2e0, 'wedge', font=2, cex=1.5 )
+text( 2e2, 8e-1, 'Foreground', font=2, cex=1.5 )
+text( 2e2, 5.8e-1, 'wedge', font=2, cex=1.5 )
 
 box( which='plot', lwd=2 )
-axis( 1, at=10^seq(-1,5,2), labels=c( expression(10^-1), expression(10^1), expression(10^3), expression(10^5)), line=0, cex=1.25 )
-axis( 2, at=10^seq(-3,3,2), labels=c( expression(10^-3), expression(10^-1), expression(10^1), expression(10^3)), line=0, cex=1.25 )
+axis( 1, at=10^seq(1,3,1), labels=c( expression(10^1), expression(10^2), expression(10^3)), line=0, cex=1.25 )
+axis( 2, at=10^seq(0,2,1), labels=c( expression(10^0), expression(10^1), expression(10^2)), line=0, cex=1.25 )
 mtext( bquote(italic('k')~~"[Mpc"^"-1"*"]"), side=1, line=3, font=3 )
 par(xpd=TRUE)
 lines( c(6.4e0,7.2e0), c(2.9e-2,2.9e-2) )
