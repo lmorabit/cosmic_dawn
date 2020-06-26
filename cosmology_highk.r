@@ -415,7 +415,7 @@ for ( i in seq(length(z_values)) ){
                 set_resolution <- resolution_asec[ii]
                 set_resolution_tolerance <- 0.1 * set_resolution
                 stations_to_use <- find_n_stations( set_resolution, obs_freq, bl_info, res_tol=set_resolution_tolerance )
-                sensitivity_matrix[ii,jj] <- getArraySens( obs_freq, 1., delta_nu[i], obs_time, stations_to_use$ncore, stations_to_use$nremote, stations_to_use$nint, 30, FALSE, quiet=TRUE )
+                sensitivity_matrix[ii,jj] <- getArraySens( obs_freq, 1., delta_nu[jj], obs_time, stations_to_use$ncore, stations_to_use$nremote, stations_to_use$nint, 30, FALSE, quiet=TRUE )
             }
             setTxtProgressBar( pb, ii )
         }
@@ -462,24 +462,30 @@ for ( i in seq(length(z_values)) ){
         tb_breaks <- seq( min(tb_breaks)-1, max(tb_breaks)+1 )
         
         if ( t/3600 < 1 ) tmp <- paste( as.character(t), 's', sep='' ) else tmp <- paste( as.character(t/3600), 'hrs', sep='' )
-        
+
         outfile <- paste( 'brightness_temp_z', as.character(z_values[i]), '_t', tmp, '.pdf', sep='' )
-        pdf( outfile)
+        cairo_pdf( outfile)
         par( mar=c(5,5,5,7) )
-        image( tmp_tb, breaks=mylevels[tb_breaks], col=mycols[tb_breaks[1:(length(tb_breaks)-1)]], axes=FALSE )
+        #image( tmp_tb, breaks=mylevels[tb_breaks], col=mycols[tb_breaks[1:(length(tb_breaks)-1)]], axes=FALSE )
+        filled.contour( kperp_range, kpar_range, tmp_tb, key.title='Brightness Temperature [K]', plot.axes = { axis(1); axis(2); contour( kperp_range, kpar_range, tmp_tb, add=TRUE ) } )#, breaks=mylevels[tb_breaks], col=mycols[tb_breaks[1:(length(tb_breaks)-1)]], axes=FALSE )
         ## k-perp axis
-        axis( 1, at=pretty(kperp_range)/max(kperp_range), labels=pretty(kperp_range), line=0, cex=1.25 )
-        axis( 2, at=pretty(kpar_range)/max(kpar_range), labels = pretty(kpar_range), line=0, cex=1.25 )
-        box( which='plot', lwd=2.5)
-        color.legend( 1.03, 0, 1.07, 1, cb_labels, rect.col=mycols, gradient='y', align='rb' )
-        text( 1.25, 0.5, labels='log(Brightness Temperature [K])', srt=270, cex=1.15, xpd=TRUE )
         mtext( bquote(italic('k')~~"[Mpc"^"-1"*"]"), side=1, line=3, font=3 )
         par(xpd=TRUE)
-        lines( c(0.4428,0.455), c(-0.155,-0.155), col='black' )
-        lines( c(0.4489,0.4489), c(-0.155,-0.14) )
+	xrange = max(kperp_range)-min(kperp_range)
+	yrange = max(kpar_range)-min(kpar_range)
+	a = xrange*(0.45)+min(kperp_range)
+	b = xrange*(0.462)+min(kperp_range)
+	c = yrange*(-0.15) + min(kpar_range)
+	d = yrange*(-0.135) + min(kpar_range)
+	lines( c(a,b), c(c,c) )
+	lines( c(b-a,b-a)*0.5+a, c(c,d) )
         mtext( bquote(italic('k')~~"[Mpc"^"-1"*"]"), side=2, line=3, font=3 )
-        lines( c(-0.16,-0.145), c(0.449,0.449) )
-        lines( c(-0.16,-0.145), c(0.453,0.453) )
+	a = xrange*(-0.185) + min(kperp_range)
+	b = xrange*(-0.17) + min(kperp_range)
+	c = yrange*0.449 + min(kpar_range)
+	d = yrange*0.449 + min(kpar_range)
+        lines( c(a,b), c(c,d) )
+        lines( c(a,b), c(c+yrange*0.005,c+yrange*0.005) )
         mtext( bquote(italic('z=')*.(z_values[i])), side=3, line=1, font=2, cex=1.5)
         dev.off()
         
