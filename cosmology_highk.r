@@ -283,7 +283,8 @@ cat( 'LBA limits are: $\\sim 10^{', log10(mean(k_par_zmax[c(3,4)])), '}$ - $10^{
 
 
 ## evaluate at these redshifts
-z_values <- c( 30, 35, 40, 45 )
+#z_values <- c( 30, 35, 40, 45 )
+z_values <- c( 30, 45 )
 zcols <- viridis(6,option='C')
 
 zz_kperp_min <- c()
@@ -438,7 +439,7 @@ for ( i in seq(length(z_values)) ){
             tb_matrix[ii,] <- tb_matrix[ii,] / ( resolution_asec[ii]^2. )
     }
     
-    time_scales <- c( 1, 800*3600, 8000*3600, 87600*3600 ) ## in seconds
+    time_scales <- c(  800*3600, 87600*3600 ) ## in seconds
     max_val <- max( tb_matrix, na.rm=TRUE )
     min_val <- min( tb_matrix / sqrt(max(time_scales)) )
     ## log min and max
@@ -465,9 +466,12 @@ for ( i in seq(length(z_values)) ){
 
         ## make plot im log 
         tmp_tb = log10(tmp_tb)
-        outfile <- paste( 'brightness_temp_z', as.character(z_values[i]), '_t', tmp, '.pdf', sep='' )
-        cairo_pdf( outfile)
-        par( mar=c(5,5,3,5) )
+        #outfile <- paste( 'brightness_temp_z', as.character(z_values[i]), '_t', tmp, '.pdf', sep='' )
+        outfile <- paste( 'brightness_temp_z', as.character(z_values[i]), '_t', tmp, '.png', sep='' )
+        #cairo_pdf( outfile)
+        ppi <- 500
+        png( outfile, res=ppi, height=5*ppi, width=6*ppi )
+        par( mar=c(3.5,3.5,3,3) )
         #newlevels <- 10^pretty( log10(range(tmp_tb)), n=15  )
         newlevels <- pretty( range(tmp_tb), n=15  )
         keylabs <- newlevels
@@ -479,15 +483,15 @@ for ( i in seq(length(z_values)) ){
         ## perpendicular symbol
 	      xrange = max(kperp_range)-min(kperp_range)
 	      yrange = max(kpar_range)-min(kpar_range)
-      	a = xrange*(0.294)+min(kperp_range)
-      	b = xrange*(0.306)+min(kperp_range)
+      	a = xrange*(0.305)+min(kperp_range)
+      	b = xrange*(0.315)+min(kperp_range)
       	c = yrange*(-0.15) + min(kpar_range)
       	d = yrange*(-0.135) + min(kpar_range)
       	lines( c(a,b), c(c,c) )
       	lines( c(b-a,b-a)*0.5+a, c(c,d) )
         ## parallel symbol
-      	a = xrange*(-0.185) + min(kperp_range)
-      	b = xrange*(-0.17) + min(kperp_range)
+      	a = xrange*(-0.145) + min(kperp_range)
+      	b = xrange*(-0.132) + min(kperp_range)
       	c = yrange*0.449 + min(kpar_range)
       	d = yrange*0.449 + min(kpar_range)
         lines( c(a,b), c(c,d) )
@@ -495,7 +499,7 @@ for ( i in seq(length(z_values)) ){
         ## perp axis label
         text( xrange*0.35+min(kperp_range), yrange*(-0.127)+min(kpar_range), bquote(italic('k')~~"[Mpc"^"-1"*"]"), font=3 )
         ## par axis label
-        mtext( bquote(italic('k')~~"[Mpc"^"-1"*"]"), side=2, line=3, font=3 )
+        mtext( bquote(italic('k')~~"[Mpc"^"-1"*"]"), side=2, line=2, font=3 )
         ## title
         text( xrange*0.35+min(kperp_range), yrange*1.05+min(kpar_range), bquote(italic('z=')*.(z_values[i])), font=2, cex=1.5)
         dev.off()
