@@ -463,31 +463,44 @@ for ( i in seq(length(z_values)) ){
         
         if ( t/3600 < 1 ) tmp <- paste( as.character(t), 's', sep='' ) else tmp <- paste( as.character(t/3600), 'hrs', sep='' )
 
+        ## make plot im log 
+        tmp_tb = log10(tmp_tb)
         outfile <- paste( 'brightness_temp_z', as.character(z_values[i]), '_t', tmp, '.pdf', sep='' )
         cairo_pdf( outfile)
-        par( mar=c(5,5,5,7) )
-        #image( tmp_tb, breaks=mylevels[tb_breaks], col=mycols[tb_breaks[1:(length(tb_breaks)-1)]], axes=FALSE )
-        filled.contour( kperp_range, kpar_range, tmp_tb, key.title='Brightness Temperature [K]', plot.axes = { axis(1); axis(2); contour( kperp_range, kpar_range, tmp_tb, add=TRUE ) } )#, breaks=mylevels[tb_breaks], col=mycols[tb_breaks[1:(length(tb_breaks)-1)]], axes=FALSE )
+        par( mar=c(5,5,3,5) )
+        #newlevels <- 10^pretty( log10(range(tmp_tb)), n=15  )
+        newlevels <- pretty( range(tmp_tb), n=15  )
+        keylabs <- newlevels
+        #lab_form <- format_log_axis_labels2(newlevels[seq(2,length(newlevels))])
+        #filled.contour( kperp_range, kpar_range, tmp_tb, levels=newlevels, col = viridis(length(newlevels),option='C'),  key.axes=axis(4, at=lab_form$at, labels=lab_form$labels ), plot.axes = { axis(1); axis(2); contour( kperp_range, kpar_range, tmp_tb, levels=newlevels, labcex=1, method='edge', add=TRUE ) } )
+        filled.contour( kperp_range, kpar_range, tmp_tb, levels=newlevels, key.title=title(main="log([K])"), plot.axes = { axis(1); axis(2); contour( kperp_range, kpar_range, tmp_tb, levels=newlevels, labcex=1, method='edge', add=TRUE ) } )
         ## k-perp axis
-        mtext( bquote(italic('k')~~"[Mpc"^"-1"*"]"), side=1, line=3, font=3 )
         par(xpd=TRUE)
-	xrange = max(kperp_range)-min(kperp_range)
-	yrange = max(kpar_range)-min(kpar_range)
-	a = xrange*(0.45)+min(kperp_range)
-	b = xrange*(0.462)+min(kperp_range)
-	c = yrange*(-0.15) + min(kpar_range)
-	d = yrange*(-0.135) + min(kpar_range)
-	lines( c(a,b), c(c,c) )
-	lines( c(b-a,b-a)*0.5+a, c(c,d) )
-        mtext( bquote(italic('k')~~"[Mpc"^"-1"*"]"), side=2, line=3, font=3 )
-	a = xrange*(-0.185) + min(kperp_range)
-	b = xrange*(-0.17) + min(kperp_range)
-	c = yrange*0.449 + min(kpar_range)
-	d = yrange*0.449 + min(kpar_range)
+        ## perpendicular symbol
+	      xrange = max(kperp_range)-min(kperp_range)
+	      yrange = max(kpar_range)-min(kpar_range)
+      	a = xrange*(0.294)+min(kperp_range)
+      	b = xrange*(0.306)+min(kperp_range)
+      	c = yrange*(-0.15) + min(kpar_range)
+      	d = yrange*(-0.135) + min(kpar_range)
+      	lines( c(a,b), c(c,c) )
+      	lines( c(b-a,b-a)*0.5+a, c(c,d) )
+        ## parallel symbol
+      	a = xrange*(-0.185) + min(kperp_range)
+      	b = xrange*(-0.17) + min(kperp_range)
+      	c = yrange*0.449 + min(kpar_range)
+      	d = yrange*0.449 + min(kpar_range)
         lines( c(a,b), c(c,d) )
         lines( c(a,b), c(c+yrange*0.005,c+yrange*0.005) )
-        mtext( bquote(italic('z=')*.(z_values[i])), side=3, line=1, font=2, cex=1.5)
+        ## perp axis label
+        text( xrange*0.35+min(kperp_range), yrange*(-0.127)+min(kpar_range), bquote(italic('k')~~"[Mpc"^"-1"*"]"), font=3 )
+        ## par axis label
+        mtext( bquote(italic('k')~~"[Mpc"^"-1"*"]"), side=2, line=3, font=3 )
+        ## title
+        text( xrange*0.35+min(kperp_range), yrange*1.05+min(kpar_range), bquote(italic('z=')*.(z_values[i])), font=2, cex=1.5)
         dev.off()
+        
+        tmp_tb = 10.^tmp_tb
         
         if ( t == max( time_scales) ){
         
